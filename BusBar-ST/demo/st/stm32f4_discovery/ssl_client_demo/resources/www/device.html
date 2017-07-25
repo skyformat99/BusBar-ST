@@ -1,0 +1,328 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>status</title>
+<script type="text/javascript" src="my.js"></script>
+<script type="text/javascript">
+	var flag;
+    function pageload() {
+        loaddata();
+    }
+    var xmlget;
+    function loaddata() {
+        xmlget = createXmlRequest();
+        xmlget.onreadystatechange = getdata;
+        ajaxget(xmlget, "/getdevice");
+    }
+    function getdata() {
+        if (xmlget.readyState == 4) {
+            var sta = xmlget.responseText;
+            var gv = new Array();
+            gv = sta.split("?");
+            flag = gv[0];
+            document.getElementById("device").value = gv[1];
+			document.getElementById("slave").value = gv[2];
+			document.getElementById("beep").value = gv[5];
+			document.getElementById("baud").value = gv[6];
+			if(parseInt(gv[4]) == 0)  //dc
+			{
+				document.getElementById("L1").style.display = "none";
+				document.getElementById("L2").style.display = "none";
+				document.getElementById("L3").style.display = "none";
+			}
+			else               //ac
+			{
+				document.getElementById("L4").style.display = "none";
+            	if (parseInt(gv[3]) != 3)  //单相
+				{
+                	document.getElementById("L2").style.display = "none";
+                	document.getElementById("L3").style.display = "none";
+            	}
+			}
+			LangFun(flag);	
+        }
+	}
+	
+	function LangFun(flag)
+	{
+		var lang_1 = ["PDU Settings", "设备设置"];
+		var lang_2 = ["PDU Name:", "设备名称:"];
+		var lang_3 = ["Modbus Address Code:", "Modbus地址码:"];
+		var lang_4 = ["Baud Rate:", "波特率:"];
+		var lang_5 = ["Save", "保存"];
+		var lang_6 = ["Energy Settings", "电能设置"];
+		var lang_7 = ["Line 1 Energy:", "Line1电能:"];
+		var lang_8 = ["Reset", "清除"];
+		var lang_9 = ["Line 2 Energy:", "Line2电能:"];
+		var lang_10 = ["Reset", "清除"];
+		var lang_11 = ["Line 3 Energy:", "Line3电能:"];
+		var lang_12 = ["Reset", "清除"];
+		var lang_13 = ["DC Energy:", "直流电能:"];	
+		var lang_14 = ["Reset", "清除"];	
+		var lang_15 = ["Buzzer Mute:", "消音功能:"];
+		var lang_16 = ["OFF", "关闭"];	
+		var lang_17 = ["ON", "打开"];				
+
+		document.getElementById("lang_1").innerHTML = lang_1[flag];
+		document.getElementById("lang_2").innerHTML = lang_2[flag];
+		document.getElementById("lang_3").innerHTML = lang_3[flag];
+		document.getElementById("lang_4").innerHTML = lang_4[flag];	
+		document.getElementById("lang_6").innerHTML = lang_6[flag];
+		document.getElementById("lang_7").innerHTML = lang_7[flag];	
+		document.getElementById("lang_9").innerHTML = lang_9[flag];	
+		document.getElementById("lang_11").innerHTML = lang_11[flag];			
+		document.getElementById("lang_13").innerHTML = lang_13[flag];	
+		document.getElementById("lang_15").innerHTML = lang_15[flag];
+		document.getElementById("lang_16").innerHTML = lang_16[flag];
+		document.getElementById("lang_17").innerHTML = lang_17[flag];	
+		document.getElementById("lang_5").value = lang_5[flag];	
+		document.getElementById("lang_8").value = lang_8[flag];	
+		document.getElementById("lang_10").value = lang_10[flag];
+		document.getElementById("lang_12").value = lang_12[flag];
+		document.getElementById("lang_14").value = lang_14[flag];
+	}		
+	
+	
+    var xmlset;
+    function setdevice() {
+        var device = document.getElementById("device").value;
+        var beep = document.getElementById("beep").value;
+        var slave = document.getElementById("slave").value;
+		var baud = document.getElementById("baud").value;
+		
+		var AllNumIsSame = new Array("’","”","!","@","#","$","%","^","&","*","=","/","?","+","~",	                                    ";","'",",","~","！","@","#","￥","%","……","&","*","+","；","‘","“",	                                    "《","》","，","。","？","、","="," ");
+		var IsTrueORfalse = false;
+		for (var i = 0; i < AllNumIsSame.length; i++) {
+			if (device.indexOf(AllNumIsSame[i]) != -1) {
+ 				IsTrueORfalse = true;
+				break;
+			}
+		}
+		if (IsTrueORfalse == true) 
+		{
+			if(flag)
+			{
+				alert("不能设置特殊字符!");
+			}
+			else
+			{
+				alert("Special characters are not allowed!");
+			}	
+			return;
+		}		
+		
+        xmlset = createXmlRequest();
+        xmlset.onreadystatechange = setdata;
+        ajaxget(xmlset, "/setdevice?a=" + device + "&b=" + beep + "&c=" + slave + "&d=" + baud  + "&");
+    }
+    function setdata() {
+        if (xmlset.readyState == 4) {
+            var sta = xmlset.responseText;
+            if (sta == "outlong") 
+			{
+				if(flag)
+				{
+					alert("设备用户名长度不能超过10个字节!");
+				}
+				else
+				{
+					alert("Device name length should not exceed 10 bytes!");
+				}               
+                return;
+            }				
+            if (sta != "OK") {
+				if(flag)
+				{
+					alert("设置失败！");
+				}
+				else
+				{
+					alert("Setting Failed！");
+				}   
+            }
+            else {
+                window.location.reload();
+            }
+        }
+    }
+    var claerset;
+    function energyclaer(order) {
+		if(flag==1)
+		{
+			if (confirm("你确定清除电能?") == false) {
+				return;
+			}			
+		}
+		else
+		{
+			if (confirm("Are you sure to clear the energy consumption?") == false) {
+				return;
+			}			
+		}
+        claerset = createXmlRequest();
+        claerset.onreadystatechange = clearrec;
+        ajaxget(claerset, "/energyzero?a=" + order+"&");
+    }
+    function clearrec() {
+        if (claerset.readyState == 4) {
+            var sta = claerset.responseText;
+            if (sta == "OK") {
+				window.location.reload();
+            }
+        }
+    } 
+</script>
+</head>
+<body style="margin:0px; overflow-x:hidden; font-size:16px;" onLoad="pageload();">
+<fieldset>
+<legend id="lang_1" style=" font-size:16px;font-family:Arial;" ></legend>
+<table width="100%" border="0" style="font-size:13px; font-family:Arial;">
+<tr align="left" style="height:22px; "><td style="width:200px;" id="lang_2"></td><td><input id="device" type="text" /></td></tr>
+<tr  style="height:22px;">
+<td style="width:200px;" id="lang_15">
+</td>
+<td><select id="beep"  >
+<option id="lang_16" value="0" >Off</option>
+<option id="lang_17" value="1" >On</option>
+</select>
+</td></tr>  
+<tr style="height:22px; ">
+<td id="lang_3"></td>
+<td><select id="slave" >
+<option value="1" >Slave1</option>
+<option value="2" >Slave2</option>
+<option value="3" >Slave3</option>
+<option value="4" >Slave4</option>
+<option value="5" >Slave5</option>
+<option value="6" >Slave6</option>
+<option value="7" >Slave7</option>
+<option value="8" >Slave8</option>
+<option value="9" >Slave9</option>
+<option value="10" >Slave10</option>
+<option value="11" >Slave11</option>
+<option value="12" >Slave12</option>
+<option value="13" >Slave13</option>
+<option value="14">Slave14</option>
+<option value="15" >Slave15</option>
+<option value="16" >Slave16</option>
+<option value="17">Slave17</option>
+<option value="18">Slave18</option>
+<option value="19">Slave19</option>
+<option value="20">Slave20</option>
+<option value="21">Slave21</option>
+<option value="22">Slave22</option>
+<option value="23">Slave23</option>
+<option value="24">Slave24</option>
+<option value="25">Slave25</option>
+<option value="26">Slave26</option>
+<option value="27">Slave27</option>
+<option value="28">Slave28</option>
+<option value="29">Slave29</option>
+<option value="30">Slave30</option>
+<option value="31">Slave31</option>
+<option value="32">Slave32</option>
+<option value="33" >Slave33</option>
+<option value="34" >Slave34</option>
+<option value="35" >Slave35</option>
+<option value="36" >Slave36</option>
+<option value="37" >Slave37</option>
+<option value="38" >Slave38</option>
+<option value="39" >Slave39</option>
+<option value="40" >Slave40</option>
+<option value="41" >Slave41</option>
+<option value="42" >Slave42</option>
+<option value="43" >Slave43</option>
+<option value="44" >Slave44</option>
+<option value="45" >Slave45</option>
+<option value="46">Slave46</option>
+<option value="47" >Slave47</option>
+<option value="48" >Slave48</option>
+<option value="49">Slave49</option>
+<option value="50">Slave50</option>
+<option value="51">Slave51</option>
+<option value="52">Slave52</option>
+<option value="53">Slave53</option>
+<option value="54">Slave54</option>
+<option value="55">Slave55</option>
+<option value="56">Slave56</option>
+<option value="57">Slave57</option>
+<option value="58">Slave58</option>
+<option value="59">Slave59</option>
+<option value="60">Slave60</option>
+<option value="61">Slave61</option>
+<option value="62">Slave62</option>
+<option value="63">Slave63</option>
+<option value="64">Slave64</option>
+<option value="65" >Slave65</option>
+<option value="66">Slave66</option>
+<option value="67" >Slave67</option>
+<option value="68" >Slave68</option>
+<option value="69">Slave69</option>
+<option value="70">Slave70</option>
+<option value="71">Slave71</option>
+<option value="72">Slave72</option>
+<option value="73">Slave73</option>
+<option value="74">Slave74</option>
+<option value="75">Slave75</option>
+<option value="76">Slave76</option>
+<option value="77">Slave77</option>
+<option value="78">Slave78</option>
+<option value="79">Slave79</option>
+<option value="80">Slave80</option>
+<option value="81">Slave81</option>
+<option value="82">Slave82</option>
+<option value="83">Slave83</option>
+<option value="84">Slave84</option>
+<option value="85" >Slave85</option>
+<option value="86">Slave86</option>
+<option value="87" >Slave87</option>
+<option value="88" >Slave88</option>
+<option value="89">Slave89</option>
+<option value="90">Slave90</option>
+<option value="91">Slave91</option>
+<option value="92">Slave92</option>
+<option value="93">Slave93</option>
+<option value="94">Slave94</option>
+<option value="95">Slave95</option>
+<option value="96">Slave96</option>
+<option value="97">Slave97</option>
+<option value="98">Slave98</option>
+<option value="99">Slave99</option>
+</select></td></tr>
+</tr>
+<tr  style="height:22px; ">
+<td style="width:200px;" id="lang_4">
+</td>
+<td><select id="baud" style="font-size:14px;" >
+<option value="0" style="font-size:14px;">1200</option>
+<option value="1" style="font-size:14px;">2400</option>
+<option value="2" style="font-size:14px;">4800</option>
+<option value="3" style="font-size:14px;">9600</option>
+<option value="4" style="font-size:14px;">19200</option>
+<option value="5" style="font-size:14px;">38400</option>
+</select>
+</td></tr> 
+</table>
+<br />
+<input id="lang_5" type="button" onClick="setdevice();" style="font-size:13px; font-family:Arial;"></input> 
+</fieldset>
+<br />
+<fieldset>
+<legend id="lang_6" style="font-size:13px; font-family:Arial;"></legend>
+<table width="100%" border="0" style="font-size:13px; font-family:Arial">
+    <tr  id="L1" style="height:22px;  "><td style="width:200px;" id="lang_7"></td>
+    <td><input id="lang_8" type="button"  onClick="energyclaer(0);"  /></td></tr>
+    <tr id="L2" style="height:22px; "><td style="width:200px;" id="lang_9"></td>
+    <td><input id="lang_10" type="button" onClick="energyclaer(1);"/></td></tr>
+    <tr id="L3" style="height:22px; ">
+    <td style="width:200px;" id="lang_11"></td>
+    <td><input id="lang_12" type="button"  onClick="energyclaer(2);" /></td></tr>
+    <tr id="L4" style="height:22px; ">
+    <td style="width:200px;" id="lang_13"></td>
+    <td><input id="lang_14" type="button" onClick="energyclaer(3);"  /></td></tr>  
+</table>
+</fieldset>
+
+
+</body>
+</html>

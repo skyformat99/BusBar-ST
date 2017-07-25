@@ -1,0 +1,156 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>status</title>
+<script type="text/javascript" src="my.js"></script>
+<script type="text/javascript">
+    var flag;
+    function pageload() {
+        loaddata();
+    }
+    var xmlget;
+    function loaddata() {
+        xmlget = createXmlRequest();
+        xmlget.onreadystatechange = getdata;
+        ajaxget(xmlget, "/getuser");
+    }
+    function getdata() {
+        if (xmlget.readyState == 4) {
+            var sta = xmlget.responseText;
+            var gv = new Array();
+            gv = sta.split("?"); 	
+			flag = gv[0]; 	
+			document.getElementById("user").value = gv[1];
+			document.getElementById("psd1").value = gv[2];
+			document.getElementById("psd2").value = gv[2];			
+			LangFun(flag);
+        }
+    }
+	
+	function LangFun(flag)
+	{
+		var lang_1 = ["User Management", "用户管理"];
+		var lang_2 = ["Username:", "用户名称:"];
+		var lang_3 = ["Password:", "用户密码:"];
+		var lang_4 = ["Confirm Password:", "密码确认:"];
+		var lang_5 = ["Save", "保存"];
+
+		document.getElementById("test_1").innerHTML = lang_1[flag];
+		document.getElementById("test_2").innerHTML = lang_2[flag];
+		document.getElementById("test_3").innerHTML = lang_3[flag];
+		document.getElementById("test_4").innerHTML = lang_4[flag];
+		document.getElementById("test_5").value = lang_5[flag];
+	}						
+	
+    var xmlset;
+    function setdevice() 
+	{
+			var user = document.getElementById("user").value;
+			var psd1 = document.getElementById("psd1").value;
+			var psd2 = document.getElementById("psd2").value;		
+			if (psd1 != psd2) 
+			{
+				if(flag)
+				{
+					alert("2次输出的密码不一样，请重新出入！");
+				}
+				else
+				{
+					alert("The two passwords you typed do not match!");
+				}	
+				return;
+			}
+			
+			var AllNumIsSame = new Array("’","”","!","@","#","$","%","^","&","*","=","/","?","+","~",	                                    ";","'",",","~","！","@","#","￥","%","……","&","*","+","；","‘","“",	                                    "《","》","，","。","？","、","="," ");
+			var IsTrueORfalse = false;
+			for (var i = 0; i < AllNumIsSame.length; i++) {
+				if (user.indexOf(AllNumIsSame[i]) != -1) {
+					IsTrueORfalse = true;
+					break;
+				}
+			}
+			if (IsTrueORfalse == true) 
+			{
+				if(flag)
+				{
+					alert("不能设置特殊字符!");
+				}
+				else
+				{
+					alert("Special characters are not allowed!");
+				}	
+				return;
+			}				
+			
+			xmlset = createXmlRequest();
+			xmlset.onreadystatechange = setdata;
+			ajaxget(xmlset, "/setuser?a=" + user + "&b=" + psd1  + "&");			
+		
+
+    }
+    function setdata() {
+        if (xmlset.readyState == 4) {
+            var sta = xmlset.responseText;				
+            if (sta == "outlong") 
+			{
+				if(flag)
+				{
+					alert("用户设置长度不能超过10个字节!");
+				}
+				else
+				{
+					alert("The user should not exceed 10 bytes length!");
+				}
+                
+                return;
+            }			
+            if (sta != "OK") 
+			{
+				if(flag)
+				{
+					alert("设置失败！");
+				}
+				else
+				{
+					alert("Setting Failed!");
+				}      
+                return;
+            }
+            else {
+                window.location.reload();
+            }
+        }
+    }  
+</script>
+<style type="text/css">
+body,td,th,input,select {
+	font-family: Arial;
+}
+</style>
+</head>
+<body style="margin:0px; overflow-x:hidden; font-size:16px;" onLoad="pageload();">
+<div>
+<fieldset>
+<legend id="test_1" style=" font-size:16px;font-family:Arial;" ></legend>
+
+ <table width="100%" border="0" style="font-size:13px; font-family:Arial;">
+<tr align="left" style="height:22px;">
+  <td style="width:120px;" id="test_2"></td><td><input id="user" type="text" style=" width:200px;" /></td></tr>
+<tr align="left" style="height:22px; ">
+  <td id="test_3"></td><td><input id="psd1" type="password" style=" width:200px;" /></td></tr>
+<tr align="left" style="height:22px; ">
+  <td id="test_4"></td><td><input id="psd2" type="password" style=" width:200px;" /></td></tr>
+<tr><td><br /></td><td></td></tr>
+</table>
+<table style="font-size:13px; font-family:Arial;">
+<tr>
+    <td id="bt3">
+    <input id="test_5"  type="button"  onClick="setdevice();"></td>
+</td><td></td></tr>
+ </table>
+</fieldset>
+</div>
+
+
+</body>
+</html>

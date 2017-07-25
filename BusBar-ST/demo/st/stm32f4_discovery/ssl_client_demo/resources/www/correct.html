@@ -1,0 +1,189 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>status</title>
+<script type="text/javascript" src="my.js"></script>
+<script type="text/javascript">
+	function pageload() {
+        loaddata();
+    }
+    var xmlget;
+    function loaddata() {
+        xmlget = createXmlRequest();
+        xmlget.onreadystatechange = getdata;
+        ajaxget(xmlget, "/getmac");
+    }
+    function getdata() {
+        if (xmlget.readyState == 4) {
+            var sta = xmlget.responseText;
+            var gv = new Array();
+            gv = sta.split("?");
+			document.getElementById("powerr").style.display = "none";
+            document.getElementById("mac1").value = gv[0];
+			document.getElementById("language").value = gv[1];
+			document.getElementById("value1").value = gv[2];
+			document.getElementById("value2").value = gv[3];
+			document.getElementById("value3").value = gv[4];
+					
+        }
+    }
+	
+    var claerset;
+    function check(order) {
+        if (confirm("Please make sure that the input source is the AC220V 6A 50Hz power supply, it will cause abnormal!!!") == false) {
+            return;
+        }
+        claerset = createXmlRequest();
+        claerset.onreadystatechange = clearrec;
+        ajaxget(claerset, "/correct?a=" + order+"&");
+    }
+	function clearrec() {
+        if (claerset.readyState == 4) {
+            var sta = claerset.responseText;
+            if (sta == "OK") {
+                alert("请确认");
+            }
+            else {
+                alert("校验失败");
+            }
+        }
+    }
+	function set() {
+        //if (confirm("确认填写的MAC地址码为16进制（0-F）！") == false) {
+        //    return;
+       // }
+		var mac1 = document.getElementById("mac1").value;
+		var language = document.getElementById("language").value;	
+		if(language>2||language<0)
+		{
+			confirm("填写错误，请重新填写");
+			return;	
+		}		
+        claerset = createXmlRequest();
+        claerset.onreadystatechange = setmac;
+        ajaxget(claerset, "/correct?a=" +3+"&b="+mac1 +"&c="+language +"&");
+    }
+    function setmac() {
+        if (claerset.readyState == 4) {
+            var sta = claerset.responseText;
+            if (sta == "OK") {
+                alert("请确认");
+            }
+            else {
+                alert("设置失败");
+            }
+        }
+    }
+</script>
+<style type="text/css">
+body,td,th,select,input {
+	font-family: Arial;
+}
+</style>
+</head>
+<body onLoad="pageload();">
+<table width="796" style="font-size:12px;">  
+    <tr>
+        <td width="133" style="width:120px;">寄存器清零</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(11);" /></td>
+        <td width="270">
+        </td>        
+    </tr>
+    <tr>
+        <td width="133" style="width:120px;">0A校准</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(12);" />
+        （校准仪设置：220V 0A）
+        </td>
+    </tr> 
+    <tr>
+        <td width="133" style="width:120px;">0A小信号校准</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(13);" />
+        （校准仪设置：220V 0A）
+        </td>
+    </tr>                           
+    <tr>
+        <td width="133" style="width:120px;">直流电流、电压校准</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(4);" />
+        （校准仪设置：220V 6A）
+        </td>
+    </tr> 
+    <tr id="powerr">
+        <td width="133" style="width:120px;">直流功率增益</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(14);" />
+        （校准仪设置：220V 6A）
+        </td>
+    </tr>       
+<tr><td width="133"><br /></td><td width="377"></td></tr>
+    <tr>
+        <td width="133" style="width:120px;">寄存器清零</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(5);" /></td>
+        <td width="270">
+        </td>        
+    </tr>
+    <tr>
+        <td width="133" style="width:120px;">A相交流校准</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(0);" /></td>
+    </tr>
+    <tr>
+        <td width="133" style="width:120px;">60°相位增益</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(6);" />
+        <input id="value1" type="text" style="width:150px; position:relative; left:15px;" />  
+         （校准仪：相位设置为60
+        </td>
+        
+    </tr>
+<tr><td width="133"><br /></td><td width="377"></td></tr>  
+    <tr>
+        <td width="133" style="width:120px;">寄存器清零</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(9);" /></td>
+        <td width="270">
+        </td>        
+    </tr>        
+    <tr>
+        <td width="133" style="width:120px;">B相交流校准</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(1);" /></td>
+    </tr> 
+    <tr>
+        <td width="133" style="width:120px;">60°相位增益</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(7);" />
+        <input id="value2" type="text" style="width:150px; position:relative; left:15px;" />
+         （校准仪：相位设置为60
+        </td>
+    </tr> 
+    <tr><td width="133"><br /></td><td width="377"></td></tr>
+    <tr>
+        <td width="133" style="width:120px;">寄存器清零</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(10);" /></td>
+        <td width="270">
+        </td>        
+    </tr>             
+    <tr>
+        <td width="133" style="width:120px;">C相交流校准</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(2);" /></td>
+    </tr> 
+    <tr>
+        <td width="133" style="width:120px;">60°相位增益</td>
+        <td width="377"><input id="Button" type="button" value="Apply" onClick="check(8);" />
+        <input id="value3" type="text" style="width:150px;  position:relative; left:15px;" />
+         （校准仪：相位设置为60
+         </td>
+    </tr> 
+    <tr><td width="133"><br /></td><td width="377"></td></tr>    
+    <tr>
+      <td height="23" style="width:120px;">语言选择</td>
+        <td>
+          <input id="language"type="text"style="width:30px;"/>
+          （1-英文，2为中文）
+        </td>
+    </tr>
+   
+<tr>
+        <td style="width:120px;">MAC</td>
+        <td>
+        <input id="mac1"type="text"style="width:300px;"/>
+     	 </td>
+        <td width="270"><input id="Button3" type="button" value="Apply" onClick="set();"/></td>
+    </tr>
+</table>
+</body>
+</html>

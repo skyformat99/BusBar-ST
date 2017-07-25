@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=gb2312" />
+<title>IP-PDU</title>
+<script type="text/javascript" src="my.js"></script>
+<script type="text/javascript">
+	var flag;
+    function pageload() {
+        loaddata();
+    }
+    var xmlget;
+    function loaddata() {
+        xmlget = createXmlRequest();
+        xmlget.onreadystatechange = getdata;
+        ajaxget(xmlget, "/getlogo");
+    }
+    function getdata()
+	{
+        if (xmlget.readyState == 4)
+		{
+            var sta = xmlget.responseText;
+            var gv = new Array();
+            gv = sta.split("?");
+			flag = parseInt(gv[0]);
+			LangFun(flag);				
+		}
+	}
+	function LangFun(flag)
+	{
+		var lang_1 = ["Welcome to CLEVER IP-PDU", "欢迎使用CLEVER IP-PDU"];
+		var lang_2 = ["Username", "账号"];
+		var lang_3 = ["Password", "密码"];
+		var lang_4 = ["Login", "登陆"];
+
+		document.getElementById("lang_1").innerHTML = lang_1[flag];
+		document.getElementById("lang_2").innerHTML = lang_2[flag];
+		document.getElementById("lang_3").innerHTML = lang_3[flag];
+		document.getElementById("lang_4").value = lang_4[flag];
+	}	
+	
+
+function keydm() {
+    if (event.keyCode == 13) {
+        login();
+    }
+}
+
+var xmlHttp;
+function login()
+{
+    var nm = document.getElementById("name").value;
+    var psd = document.getElementById("psd").value;
+    xmlHttp = createXmlRequest();
+    xmlHttp.onreadystatechange = urldata;
+    ajaxget(xmlHttp,"/login?a=" + nm + "&b=" + psd + "&");
+}
+function urldata() {
+    if (xmlHttp.readyState == 4) {
+        var sta = xmlHttp.responseText;
+        if (sta == "OK") {
+            document.location.href = "/home.html";
+        }
+        else 
+		{
+			if(flag==0)
+			{
+				alert("Login fail!");
+			}
+			else
+			{
+				alert("登陆失败!");
+			}
+            
+        }
+    }
+}
+
+</script>
+<style>
+html{overflow-x:hidden;}
+body,td,th,input {
+	font-family: Arial;
+}
+</style>
+</head>
+<body onLoad="pageload(); keydm();">
+<div align="center">
+<div>
+<div style="position:relative;width:300px;height:25px; top:150px;color:#ffffff;background-color:#004a9c;border-style:solid; border-width:1px;border-color:#000000;">
+<span id="lang_1" style="font-size:16px;"><b></b></span></div>
+<div style="position:relative; width:300px;height:180px; top:149px;background-color:#ffffff;border-style:solid; border-width:1px;border-color:#000000;">
+<br/><br/><br/>
+<table style="font-size:13px;font-family: Arial;">
+	<tr>
+		<td id="lang_2">
+		</td>
+		<td>
+		<input id="name" type="text" style="width:120px;"/>
+		</td>
+	</tr>
+	<tr>
+		<td id="lang_3">
+		</td>
+		<td>
+		<input id="psd" type="password" style="width:120px;"/>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td><br>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td align="right">
+		<input id="lang_4" type="button" style="width:60px;"  onClick="login();"/>
+		</td>
+	</tr>
+</table>
+</div>
+</div>
+</div>
+
+</body>
+</html>

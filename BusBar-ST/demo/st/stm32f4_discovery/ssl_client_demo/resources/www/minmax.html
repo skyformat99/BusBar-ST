@@ -1,0 +1,364 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>status</title>
+<style>
+html{overflow-x:hidden;}
+</style>
+<script type="text/javascript" src="my.js"></script>
+<script type="text/javascript">
+	var flag;
+    function pageload() {
+        loaddata();
+    }
+    var xmlget;
+    function loaddata() {
+        xmlget = createXmlRequest();
+        xmlget.onreadystatechange = getdata;
+        ajaxget(xmlget, "/getlimit");
+    }
+    function getdata() {
+        if (xmlget.readyState == 4) {
+            var sta = xmlget.responseText;
+            var gv = new Array();
+            gv = sta.split("?");
+			flag = parseInt(gv[19]);
+            if (gv[18] == "3")    //三相
+			{
+                document.getElementById("tr2").style.display = "";
+                document.getElementById("tr3").style.display = "";
+                document.getElementById("tr4").style.display = "";
+                document.getElementById("tr6").style.display = "";
+            }
+            else       //单相
+			{
+                document.getElementById("tr2").style.display = "none";
+                document.getElementById("tr3").style.display = "none";
+                document.getElementById("tr5").style.display = "none";
+                document.getElementById("tr6").style.display = "none";
+            }
+            for (i = 0; i < 3; i++) 
+			{
+                document.getElementById("cur" + (i + 1)).innerHTML = parseFloat(gv[0 + i * 3]) / 10; //0-8
+                document.getElementById("min" + (i + 1)).value = parseFloat(gv[1 + i * 3]) / 10;
+                document.getElementById("max" + (i + 1)).value = parseFloat(gv[2 + i * 3]) / 10;
+                if (parseFloat(gv[0 + i * 3]) < parseFloat(gv[1 + i * 3])
+                || parseFloat(gv[0 + i * 3]) > parseFloat(gv[2 + i * 3])) 
+				{
+                    document.getElementById("cur" + (i + 1)).style.color = "#FF0000";
+                }
+                else 
+				{
+                    document.getElementById("cur" + (i + 1)).style.color = "#000000";
+                }
+            }
+            for (i = 0; i < 3; i++) 
+			{
+                document.getElementById("v" + (i + 1)).innerHTML = parseInt(gv[9 + i * 3]); //9-17
+                document.getElementById("min" + (i + 4)).value = parseInt(gv[10 + i * 3]);
+                document.getElementById("max" + (i + 4)).value = parseInt(gv[11 + i * 3]);
+                if (parseInt(gv[9 + i * 3]) < parseInt(gv[10 + i * 3])
+                || parseInt(gv[9 + i * 3]) > parseInt(gv[11 + i * 3])) 
+				{
+                    document.getElementById("v" + (i + 1)).style.color = "#FF0000";
+                }
+                else 
+				{
+                    document.getElementById("v" + (i + 1)).style.color = "#000000";
+                }
+            }
+			
+			document.getElementById("tem").innerHTML = parseInt(gv[20]);
+			document.getElementById("min7").value = parseInt(gv[21]);
+			document.getElementById("max7").value = parseInt(gv[22]);
+			
+			document.getElementById("hum").innerHTML = parseInt(gv[23]);
+			document.getElementById("min8").value = parseInt(gv[24]);
+			document.getElementById("max8").value = parseInt(gv[25]);
+			if (parseInt(gv[20]) < parseInt(gv[21])|| parseInt(gv[20]) > parseInt(gv[22])) 
+			{
+				document.getElementById("tem").style.color = "#FF0000";
+			}
+			else 
+			{
+				document.getElementById("tem").style.color = "#000000";
+			}
+			if(parseInt(gv[23]) < parseInt(gv[24])|| parseInt(gv[23]) > parseInt(gv[25]))
+			{
+				document.getElementById("hum").style.color = "#FF0000";
+			}
+            else 
+			{
+				document.getElementById("hum").style.color = "#000000";
+			}
+			LangFun(flag);	
+        }
+    }
+	
+	function LangFun(flag)
+	{
+		var lang_1 = ["Current Settings", "电流设置"];
+		var lang_2 = ["Item", "编号"];
+		var lang_3 = ["Name", "名称"];
+		var lang_4 = ["State(A)", "电流(A)"];
+		var lang_5 = ["Min(A)", "最小值(A)"];
+		var lang_6 = ["Max(A)", "最大值(A)"];
+		var lang_7 = ["Save", "设置"];
+		var lang_8 = ["Line 1 Current", "Line 1 电流"];
+		var lang_9 = ["Save", "保存"];
+		var lang_10 = ["Line 2 Current", "Line 2 电流"];
+		var lang_11 = ["Save", "保存"];
+		var lang_12 = ["Line 3 Current", "Line 3 电流"];
+		var lang_13 = ["Save", "保存"];	
+		var lang_14 = ["Voltage Settings", "电压设置"];
+		var lang_15 = ["Item", "编号"];	
+		var lang_16 = ["Name", "名称"];
+		var lang_17 = ["State(V)", "电压(V)"];	
+		var lang_18 = ["Min(V)", "最小值(V)"];	
+		var lang_19 = ["Max(V)", "最大值(V)"];
+		var lang_20 = ["Save", "设置"];
+		var lang_21 = ["Line 1 Voltage:", "Line 1 电压"];
+		var lang_22 = ["Save", "保存"];
+		var lang_23 = ["Line 2 Voltage:", "Line 2 电压"];
+		var lang_24 = ["Save", "保存"];
+		var lang_25 = ["Line 3 Voltage:", "Line 3 电压"];
+		var lang_26 = ["Save", "保存"];
+		var lang_27 = ["Sensor Settings", "传感器设置"];	
+		var lang_28 = ["Item", "编号"];	
+		var lang_29 = ["Name", "名称"];
+		var lang_30 = ["Status", "状态"];	
+		var lang_31 = ["Min", "最小值"];	
+		var lang_32 = ["Max", "最大值"];	
+		var lang_33 = ["Save", "设置"];	
+		var lang_34 = ["Temp（℃）", "温度(℃)"];	
+		var lang_35 = ["Save", "保存"];	
+		var lang_36 = ["Hum（％）", "湿度(%)"];	
+		var lang_37 = ["Save", "保存"];							
+
+		document.getElementById("lang_1").innerHTML = lang_1[flag];
+		document.getElementById("lang_2").innerHTML = lang_2[flag];
+		document.getElementById("lang_3").innerHTML = lang_3[flag];
+		document.getElementById("lang_4").innerHTML = lang_4[flag];
+		document.getElementById("lang_5").innerHTML = lang_5[flag];
+		document.getElementById("lang_6").innerHTML = lang_6[flag];
+		document.getElementById("lang_7").innerHTML = lang_7[flag];
+		document.getElementById("lang_8").innerHTML = lang_8[flag];	
+		document.getElementById("lang_10").innerHTML = lang_10[flag];	
+		document.getElementById("lang_12").innerHTML = lang_12[flag];	
+		document.getElementById("lang_14").innerHTML = lang_14[flag];
+		document.getElementById("lang_15").innerHTML = lang_15[flag];
+		document.getElementById("lang_16").innerHTML = lang_16[flag];
+		document.getElementById("lang_17").innerHTML = lang_17[flag];		
+		document.getElementById("lang_18").innerHTML = lang_18[flag];
+		document.getElementById("lang_19").innerHTML = lang_19[flag];
+		document.getElementById("lang_20").innerHTML = lang_20[flag];
+		document.getElementById("lang_21").innerHTML = lang_21[flag];
+		document.getElementById("lang_23").innerHTML = lang_23[flag];
+		document.getElementById("lang_25").innerHTML = lang_25[flag];	
+		document.getElementById("lang_27").innerHTML = lang_27[flag];
+		document.getElementById("lang_28").innerHTML = lang_28[flag];	
+		document.getElementById("lang_29").innerHTML = lang_29[flag];	
+		document.getElementById("lang_30").innerHTML = lang_30[flag];
+		document.getElementById("lang_31").innerHTML = lang_31[flag];
+		document.getElementById("lang_32").innerHTML = lang_32[flag];
+		document.getElementById("lang_33").innerHTML = lang_33[flag];
+		document.getElementById("lang_34").innerHTML = lang_34[flag];	
+		document.getElementById("lang_36").innerHTML = lang_36[flag];
+		document.getElementById("lang_9").value = lang_9[flag];
+		document.getElementById("lang_11").value = lang_11[flag];
+		document.getElementById("lang_13").value = lang_13[flag];
+		document.getElementById("lang_22").value = lang_22[flag];
+		document.getElementById("lang_24").value = lang_24[flag];
+		document.getElementById("lang_26").value = lang_26[flag];
+		document.getElementById("lang_35").value = lang_35[flag];
+		document.getElementById("lang_37").value = lang_37[flag];						
+	}		
+	
+	
+    var xmlset;
+    function setlimit(action) {
+        var min;
+        var max
+        if (action > 0 && action < 4) {
+            min = parseFloat(document.getElementById("min" + action).value) * 10;
+            max = parseFloat(document.getElementById("max" + action).value) * 10;
+            if (min > max || min > 630 || max > 630 || min>max) {
+				if(flag)
+				{
+					alert("设置错误！");
+				}
+				else
+				{
+					
+				}       
+                return;
+            }
+        }
+        else if (action > 3 && action < 7) {
+            min = parseInt(document.getElementById("min" + action).value);
+            max = parseInt(document.getElementById("max" + action).value);
+            if (min > max || min > 400 || max > 400 || min>max) {
+				if(flag)
+				{
+					alert("设置错误！");
+				}
+				else
+				{
+					
+				}  
+                return;
+            }
+        }
+		else if (action > 6 && action < 9) {
+            min = parseInt(document.getElementById("min" + action).value);
+            max = parseInt(document.getElementById("max" + action).value);
+            if (min > max || min > 99 || max < 0 || min>max) {
+				if(flag)
+				{
+					alert("设置错误！");
+				}
+				else
+				{
+					
+				}
+                
+                return;
+            }
+        }
+        else {
+            return;
+        }
+        xmlset = createXmlRequest();
+        xmlset.onreadystatechange = setdata;
+        ajaxget(xmlset, "/setlimit?a=" + action + "&b="+min+"&c="+max+"&");
+    }
+    function setdata() {
+        if (xmlset.readyState == 4) {
+            var sta = xmlset.responseText;
+            if (sta == "err") {
+				if(flag)
+				{
+					alert("设置失败！");
+				}
+				else
+				{
+					
+				}  
+            }
+            else {
+                window.location.reload();
+            }
+        }
+    }
+</script>
+</head>
+<body onLoad="pageload();" style="margin:0px; overflow-x:hidden; font-size:16px;">   
+<fieldset>
+<legend id="lang_1" style="font-size:16px;font-family:Arial;" ></legend>
+    <table width="100%" style="font-size:13px;font-family:Arial;">
+        <tr align="center" style="color:#FFFFFF;background:#0054A8;">
+            <td height="22px" id="lang_2"></td>
+            <td id="lang_3"></td>
+            <td id="lang_4"></td>
+            <td id="lang_5"></td>
+            <td id="lang_6"></td>
+            <td id="lang_7"></td>
+        </tr>
+        <tr id="tr1" align="center">
+            <td height="22px">1</td>
+            <td id="lang_8"></td>
+            <td id="cur1"></td>
+            <td><input id="min1" type="text" style="width:60px;"  /></td>
+            <td><input id="max1" type="text" style="width:60px;"  /></td>
+            <td><input id="lang_9" type="button"  onClick="setlimit(1);"/> </td>
+        </tr>
+        <tr id="tr2" align="center" style="background-color:#f2f2f2;">
+            <td height="22px">2</td>
+            <td id="lang_10"></td>
+            <td id="cur2"></td>
+            <td><input id="min2" type="text" style="width:60px;"  /></td>
+            <td><input id="max2" type="text" style="width:60px;"  /></td>
+            <td><input id="lang_11" type="button"  onClick="setlimit(2);"/> </td>
+        </tr>
+        <tr id="tr3" align="center">
+            <td height="22px">3</td>
+            <td id="lang_12"></td>
+            <td id="cur3"></td>
+            <td><input id="min3" type="text" style="width:60px;"  /></td>
+            <td><input id="max3" type="text" style="width:60px;"  /></td>
+            <td><input id="lang_13" type="button"  onClick="setlimit(3);"/> </td>
+        </tr>
+    </table> 
+</fieldset>    
+<br />
+<fieldset>
+<legend id="lang_14" style="font-size:16px;font-family:Arial;" ></legend>
+<table width="100%" border="0" style="font-size:13px; font-family:Arial;">
+        <tr align="center" style="color:#FFFFFF;background:#0054A8;">
+            <td height="22px" id="lang_15"></td>
+            <td id="lang_16"></td>
+            <td id="lang_17"></td>
+            <td id="lang_18"></td>
+            <td id="lang_19"></td>
+            <td id="lang_20"></td>
+        </tr>
+        <tr id="tr4" align="center">
+            <td height="22px">1</td>
+            <td id="lang_21"></td>
+            <td id="v1"></td>
+            <td><input id="min4" type="text" style="width:60px;"  /></td>
+            <td><input id="max4" type="text" style="width:60px;"  /></td>
+            <td><input id="lang_22" type="button"  onClick="setlimit(4);"/> </td>
+        </tr>
+        <tr id="tr5" align="center" style="background-color:#f2f2f2;">
+            <td height="22px">2</td>
+            <td id="lang_23"></td>
+            <td id="v2"></td>
+            <td><input id="min5" type="text" style="width:60px;"  /></td>
+            <td><input id="max5" type="text" style="width:60px;"  /></td>
+            <td><input id="lang_24" type="button"  onClick="setlimit(5);"/> </td>
+        </tr>
+        <tr id="tr6" align="center">
+            <td height="22px">3</td>
+            <td id="lang_25"></td>
+            <td id="v3"></td>
+            <td><input id="min6" type="text" style="width:60px;"  /></td>
+            <td><input id="max6" type="text" style="width:60px;"  /></td>
+            <td><input id="lang_26" type="button"  onClick="setlimit(6);"/> </td>
+        </tr>
+</table>
+</fieldset>    
+<br />
+<fieldset>
+<legend id="lang_27" style="font-size:16px;font-family:Arial;" ></legend>
+<table width="100%" border="0" style="font-size:13px; font-family:Arial;">
+        <tr align="center" style="color:#FFFFFF;background:#0054A8;">
+            <td width="58" height="22px" id="lang_28"></td>
+            <td width="150" id="lang_29"></td>
+            <td width="97" id="lang_30"></td>
+            <td width="134" id="lang_31"></td>
+            <td width="136" id="lang_32"></td>
+            <td width="97" id="lang_33"></td>
+        </tr>
+        <tr id="tr7" align="center">
+            <td height="22px">1</td>
+            <td id="lang_34"></td>
+            <td id="tem"></td>
+            <td><input id="min7" type="text" style="width:60px;"  /></td>
+            <td><input id="max7" type="text" style="width:60px;"  /></td>
+            <td><input id="lang_35" type="button"  onClick="setlimit(7);"/> </td>
+        </tr>
+        <tr id="tr8" align="center" style="background-color:#f2f2f2;">
+            <td height="22px">2</td>
+            <td id="lang_36"></td>
+            <td id="hum"></td>
+            <td><input id="min8" type="text" style="width:60px;"  /></td>
+            <td><input id="max8" type="text" style="width:60px;"  /></td>
+            <td><input id="lang_37" type="button" onClick="setlimit(8);"/> </td>
+        </tr>
+</table>
+</fieldset> 
+    
+    
+</body>
+</html>

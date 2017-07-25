@@ -1,0 +1,152 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>status</title>
+<script type="text/javascript" src="my.js"></script>
+<script type="text/javascript">
+	var flag;
+    function pageload() {
+        loaddata();
+    }
+    var xmlget;
+    function loaddata() {
+        xmlget = createXmlRequest();
+        xmlget.onreadystatechange = getdata;
+        ajaxget(xmlget, "/getsmtp");
+    }
+    function getdata() {
+        if (xmlget.readyState == 4) {
+            var sta = xmlget.responseText;
+            var gv = new Array();
+            gv = sta.split("?");
+            document.getElementById("user").value = gv[0];
+            document.getElementById("psd").value = gv[1];
+            document.getElementById("server").value = gv[2];
+            document.getElementById("port").value = gv[3];
+            document.getElementById("to").value = gv[4]; 
+			flag =  gv[5]; 
+			LangFun(flag);
+        }
+    }
+	
+	function LangFun(flag)
+	{
+		var lang_1 = ["SMTP Settings", "邮件设置"];
+		var lang_2 = ["SMTP Account:", "发件箱账号:"];
+		var lang_3 = ["Password:", "发件箱密码:"];
+		var lang_4 = ["SMTP Server:", "发件箱服务器:"];
+		var lang_5 = ["Port:", "发件箱端口号:"];
+		var lang_6 = ["Send to", "接收邮箱"];
+		var lang_7 = ["Testing", "测试"];
+		var lang_8 = ["Save", "保存"];			
+
+		document.getElementById("lang_1").innerHTML = lang_1[flag];
+		document.getElementById("lang_2").innerHTML = lang_2[flag];
+		document.getElementById("lang_3").innerHTML = lang_3[flag];
+		document.getElementById("lang_4").innerHTML = lang_4[flag];
+		document.getElementById("lang_5").innerHTML = lang_5[flag];
+		document.getElementById("lang_6").innerHTML = lang_6[flag];
+		document.getElementById("lang_7").value = lang_7[flag];
+		document.getElementById("lang_8").value = lang_8[flag];		
+	}	
+	
+    var xmlset;
+    function setdevice() {
+        var user = document.getElementById("user").value;
+        var psd = document.getElementById("psd").value;
+        var server = document.getElementById("server").value;
+        var port = document.getElementById("port").value;
+        var to = document.getElementById("to").value;
+        xmlset = createXmlRequest();
+        xmlset.onreadystatechange = setdata;
+        ajaxget(xmlset, "/setsmtp?a=" + user + "&b=" + psd + "&c=" + server + "&d=" + port + "&e="+ to +"&");
+    }
+    function setdata() {
+        if (xmlset.readyState == 4) {
+            var sta = xmlset.responseText;
+            if (sta != "OK") {
+				if(flag)
+				{
+					alert("设置失败！");
+				}
+				else
+				{
+					alert("Setting Failed！");
+				}
+                
+                return;
+            }
+            else {
+                window.location.reload();
+            }
+        }
+    }
+    var xmltest;
+    function test() {
+        var user = document.getElementById("user").value;
+        var psd = document.getElementById("psd").value;
+        var server = document.getElementById("server").value;
+        var port = document.getElementById("port").value;
+        var to = document.getElementById("to").value;
+        xmltest = createXmlRequest();
+        xmltest.onreadystatechange = settest;
+        ajaxget(xmltest, "/smtptest?a=" + user + "&b=" + psd + "&c=" + server + "&d=" + port + "&e=" + to + "&");
+    }
+    function settest() {
+        if (xmltest.readyState == 4) {
+            var sta = xmltest.responseText;
+            if (sta != "OK") {
+				if(flag)
+				{
+					alert("测试失败！");
+				}
+				else
+				{
+					alert("Testing Failed！");
+				}
+                
+                return;
+            }
+			else
+			{
+				if(flag)
+				{
+					alert("测试成功！");
+				}
+				else
+				{
+					alert("Testing Success！");
+				}
+                
+                return;				
+			}
+        }
+    }
+</script>
+<style type="text/css">
+body,td,th,input {
+	font-family: Arial;
+}
+</style>
+</head>
+<body style="margin:0px; overflow-x:hidden; font-size:16px;" onLoad="pageload();">
+<fieldset>
+<legend id="lang_1" style=" font-size:16px;font-family:Arial;"></legend>
+<table width="100%" border="0" style="font-size:13px; font-family:Arial;">
+<tr align="left" style="height:22px; ">
+  <td style="width:120px;" id="lang_2"></td><td><input id="user" type="text" style=" width:200px;" /></td></tr>
+<tr align="left" style="height:22px; ">
+  <td style="width:120px;" id="lang_3"></td><td><input id="psd" type="password" style=" width:200px;" /></td></tr>
+<tr align="left" style="height:22px; ">
+  <td style="width:120px;" id="lang_4"></td><td><input id="server" type="text"style=" width:200px;" /></td></tr>
+<tr align="left" style="height:22px; ">
+  <td style="width:120px;" id="lang_5"></td><td><input id="port" type="text" style=" width:200px;"/></td></tr>
+<tr align="left" style="height:22px; ">
+  <td style="width:120px;" id="lang_6"></td><td><input id="to" type="text"style="width:200px;" /></td></tr>
+<tr><td><br /></td><td></td></tr>
+<tr><td><input id="lang_7" type="button" value="Testing" onClick="test();"/></td><td><input type="button" id="lang_8" value="Save" onClick="setdevice();"style="font-size:14px; " /></td></tr>
+</table>
+</fieldset>
+
+</body>
+</html>

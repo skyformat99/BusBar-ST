@@ -1,0 +1,100 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>status</title>
+<script type="text/javascript" src="my.js"></script>
+<script type="text/javascript">
+	var flag;
+    function pageload() {
+        loaddata();
+    }
+    var xmlget;
+    function loaddata() {
+        xmlget = createXmlRequest();
+        xmlget.onreadystatechange = getdata;
+        ajaxget(xmlget, "/getsys");
+    }
+    function getdata()
+	{
+        if (xmlget.readyState == 4)
+		{
+            var sta = xmlget.responseText;
+            var gv = new Array();
+            gv = sta.split("?");
+			flag = parseInt(gv[0]);
+			LangFun(flag);				
+		}
+	}
+	function LangFun(flag)
+	{
+		var lang_1 = ["System Settings", "系统设置"];
+		var lang_2 = ["Select Activity:", "选择命令"];
+		var lang_3 = ["Restart", "重启"];
+		var lang_4 = ["Restore To Default Settings", "恢复出厂设置"];
+		var lang_5 = ["Save", "保存"];
+
+		document.getElementById("lang_1").innerHTML = lang_1[flag];
+		document.getElementById("lang_2").innerHTML = lang_2[flag];
+		document.getElementById("lang_3").innerHTML = lang_3[flag];
+		document.getElementById("lang_4").innerHTML = lang_4[flag];
+		document.getElementById("lang_5").value = lang_5[flag];
+	}	
+
+
+    var xmlset;
+    function setdevice() 
+    {
+        var order = document.getElementById("order").value;
+		if(flag)
+		{
+			if(confirm("你确定要执行?")) 
+			{
+				xmlset = createXmlRequest();
+				xmlset.onreadystatechange = setdata;
+				ajaxget(xmlset, "/setsys?a=" + order + "&");
+			}			
+		}
+		else
+		{
+			if(confirm("Do you want to continue?")) 
+			{
+				xmlset = createXmlRequest();
+				xmlset.onreadystatechange = setdata;
+				ajaxget(xmlset, "/setsys?a=" + order + "&");
+			}			
+			
+		}		
+    }
+    function setdata() {
+            setInterval("relogin();", 3000);
+    }
+    function relogin() {
+        window.parent.location.href="index.html";
+    }
+</script>
+<style type="text/css">
+body,td,th,input,select {
+	font-family: Arial;
+}
+</style>
+</head>
+<body style="margin:0px; overflow-x:hidden; font-size:16px;" onLoad="pageload();">
+<div>
+<fieldset>
+<legend id="lang_1" style=" font-size:16px;font-family:Arial;" ></legend>
+<table width="100%" border="0" style="font-size:13px; font-family:Arial;">
+<tr align="left" style="height:22px;">
+<td style="width:120px;" id="lang_2"></td>
+<td><select id="order" >
+<option value="0" id="lang_3" ></option>
+<option value="1" id="lang_4" ></option>
+</select></td>
+</tr>
+<tr><td><br /></td><td></td></tr>
+</table>
+<input id="lang_5" type="button" onClick="setdevice();" style=" font-size:16px;font-family:Arial;"></input>
+</fieldset>
+</div>
+
+</body>
+</html>

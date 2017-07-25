@@ -1,0 +1,240 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>status</title>
+<script type="text/javascript" src="my.js"></script>
+<script type="text/javascript">
+	 var flag;
+     function pageload() {
+        loaddata();
+    }
+    var xmlget;
+    function loaddata() {
+        xmlget = createXmlRequest();
+        xmlget.onreadystatechange = getdata;
+        ajaxget(xmlget, "/getsnmp");
+    }
+    function getdata() {
+        if (xmlget.readyState == 4) {
+            var sta = xmlget.responseText;
+            var gv = new Array();
+            gv = sta.split("?");
+            document.getElementById("ip1").value = gv[0];
+            document.getElementById("ip2").value = gv[1];
+            document.getElementById("order").value = gv[2];   //telnet on/off
+			flag = parseInt(gv[3]);   
+            document.getElementById("snmpv3").value = gv[4];
+            document.getElementById("user").value = gv[5];
+            document.getElementById("psd").value = gv[6];
+			document.getElementById("pra").value = gv[7];					
+			
+			document.getElementById("get").innerHTML = "public";
+			document.getElementById("set").innerHTML = "private";
+			LangFun(flag);			
+        }
+    }
+	
+	function LangFun(flag)
+	{
+		var lang_1 = ["SNMP Proxy Settings(v1/v2c)", "SNMP代理(v1/v2c)设置"];
+		var lang_2 = ["Save", "保存"];
+		var lang_3 = ["SNMP Proxy Settings(v3)", "SNMP代理(v3)设置"];
+		var lang_4 = ["OFF", "关闭"];
+		var lang_5 = ["ON", "打开"];
+		var lang_6 = ["Account:", "账号:"];
+		var lang_7 = ["Password:", "密码:"];
+		var lang_8 = ["Encryption Key:", "秘钥:"];
+		var lang_9 = ["Save", "保存"];
+		var lang_10 = ["Telnet Settings", "Telnet设置"];
+		var lang_11 = ["OFF", "关闭"];
+		var lang_12 = ["ON", "打开"];
+		var lang_13 = ["Save", "保存"];		
+
+		document.getElementById("lang_1").innerHTML = lang_1[flag];	
+		document.getElementById("lang_3").innerHTML = lang_3[flag];
+		document.getElementById("lang_6").innerHTML = lang_6[flag];
+		document.getElementById("lang_7").innerHTML = lang_7[flag];
+		document.getElementById("lang_8").innerHTML = lang_8[flag];	
+		document.getElementById("lang_10").innerHTML = lang_10[flag];	
+		document.getElementById("lang_4").innerHTML = lang_4[flag];
+		document.getElementById("lang_5").innerHTML = lang_5[flag];		
+		document.getElementById("lang_11").innerHTML = lang_11[flag];	
+		document.getElementById("lang_12").innerHTML = lang_12[flag];
+		document.getElementById("lang_9").value = lang_9[flag];	
+		document.getElementById("lang_2").value = lang_2[flag];	
+		document.getElementById("lang_13").value = lang_13[flag];
+	}	
+	
+	
+    var xmlset;
+    function setdevice(index) 
+	{
+		if(index==1)
+		{
+			var ip1 = document.getElementById("ip1").value;
+			var ip2 = document.getElementById("ip2").value;
+			if (checkIP(ip1)) {
+				return;
+			}
+			if (checkIP(ip2)) {
+				return;
+			}
+			xmlset = createXmlRequest();
+			xmlset.onreadystatechange = setdata;
+			ajaxget(xmlset, "/setsnmp?a=" + index + "&b=" + ip1 + "&c=" + ip2 +"&");			
+		}
+		else if(index==2)
+		{
+			var snmpv3 = document.getElementById("snmpv3").value;
+			var user = document.getElementById("user").value;
+			var psd = document.getElementById("psd").value;
+			var pra = document.getElementById("pra").value;
+			xmlset = createXmlRequest();
+			xmlset.onreadystatechange = setdata;
+			ajaxget(xmlset, "/setsnmp?a=" + index + "&b=" + snmpv3 + "&c=" + user + "&d=" + psd + "&e="+pra+"&");			
+		}
+		else if(index==3)
+		{
+			var order = document.getElementById("order").value;
+			xmlset = createXmlRequest();
+			xmlset.onreadystatechange = setdata;
+			ajaxget(xmlset, "/setsnmp?a=" + index + "&b=" + order  +"&");				
+		}
+    }
+    function setdata() {
+        if (xmlset.readyState == 4) {
+            var sta = xmlset.responseText;
+            if (sta == "lesslong")
+			{
+				if(flag)
+				{
+					alert("用户设置长度不能少于8个字节!");
+				}
+				else
+				{
+					alert("Length of user Settings may not be less than 8 bytes!");
+				}
+                
+                return;
+            }			
+            if (sta == "outlong") 
+			{
+				if(flag)
+				{
+					alert("用户设置长度不能超过16个字节!");
+				}
+				else
+				{
+					alert("Users to set the length no more than 16 bytes!");
+				}            
+                return;
+            }				
+            if (sta != "OK") 
+			{
+				if(flag)
+				{
+					alert("设置失败！");
+				}
+				else
+				{
+					alert("Setting Failed！");
+				}  
+                return;
+            }
+            else {
+                window.location.reload();
+				if(flag)
+				{
+					alert("设置成功，请重启设备！");
+				}
+				else
+				{
+					alert("Configured successfully, please reboot the device!");
+				}
+            }
+        }
+    }
+    function checkIP(value) {
+        var exp = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+        var reg = value.match(exp);
+        if (reg == null) {
+			if(flag)
+			{
+				alert("地址设置错误！");
+			}
+			else
+			{
+				alert("The address format was not correct！");
+			}
+            return 1;
+        }
+        return 0;
+    }
+</script>
+<style type="text/css">
+body,td,th,input,select {
+	font-family: Arial;
+}
+</style>
+</head>
+<body style="margin:0px; overflow-x:hidden; font-size:16px;" onLoad="pageload();">
+<div>
+<fieldset>
+<legend id="lang_1" style="font-size:16px;font-family:Arial;"></legend>
+<table width="100%" border="0" style="font-size:13px; font-family:Arial;">
+<tr align="left" style="height:22px; "><td style="width:120px;">Get Community:</td><td id="get" style="height:22px; "></td></tr>
+<tr align="left" style="height:22px; "><td style="width:120px;">Set Community:</td><td id="set"></td></tr>
+<tr align="left" style="height:22px; "><td style="width:120px;">Trap1 IP:</td><td><input id="ip1" type="text" style=" width:200px;" /></td></tr>
+<tr align="left" style="height:22px; "><td style="width:120px;">Trap2 IP:</td><td><input id="ip2" type="text" style=" width:200px;"/></td></tr>
+<tr><td><br /></td><td></td></tr>
+</table>
+<input id="lang_2" type="button"  onClick="setdevice(1);" style="font-size:13px; font-family:Arial;"></input>
+</fieldset>
+</div><br />
+<fieldset>
+<legend id="lang_3" style="font-size:16px;font-family:Arial;" ></legend>
+<table width="100%" border="0" style="font-size:13px; font-family:Arial;">
+	<tr>
+		<td width="120" >SNMPv3:</td>
+		<td><select id="snmpv3" style="width:200px">
+		<option value="0" id="lang_4"></option>
+		<option value="1" id="lang_5"></option> 
+		</select></td>
+	</tr>
+	<tr>
+		<td  id="lang_6"></td>
+		<td><input id="user" style="width:200px"></input></td>
+	</tr>
+	<tr>
+		<td id="lang_7"></td>
+		<td><input id="psd" style="width:200px"></input></td>
+	</tr>
+	<tr>
+		<td id="lang_8"></td>
+		<td><input id="pra" style="width:200px"></input></td>
+	</tr>
+	</table><br>
+	<input id="lang_9" type="button"  onClick="setdevice(2);" style="font-size:13px; font-family:Arial;"></input>
+
+</fieldset>
+<br />
+<fieldset>
+<legend id="lang_10" style="font-size:13px; font-family:Arial;" ></legend>
+<table width="100%" border="0" style="font-size:13px; font-family:Arial;">
+
+<tr align="left" style="height:22px;">
+    <td style="width:120px;">Telnet Server:</td>
+    <td>
+        <select id="order" >
+        <option value="0"  id="lang_11"></option>
+        <option value="1"  id="lang_12"></option>
+        </select>
+    </td>
+</tr>
+<tr><td><br /></td><td></td></tr>
+</table>
+<input id="lang_13" type="button" onClick="setdevice(3);" style="font-size:13px; font-family:Arial;" ></input>
+</fieldset>
+
+</body>
+</html>
